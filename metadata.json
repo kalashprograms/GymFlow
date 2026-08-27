@@ -1,0 +1,6 @@
+{
+  "name": "GymFlow",
+  "description": "Modern SaaS platform for gym owners to manage memberships, automated expiry reminders, payments, attendance, and business analytics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
