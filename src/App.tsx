@@ -23,6 +23,7 @@ import { ExpiryCalendarView } from './views/calendar/ExpiryCalendarView';
 import { NotificationsView } from './views/notifications/NotificationsView';
 import { ReportsView } from './views/reports/ReportsView';
 import { AIAssistantView } from './views/ai/AIAssistantView';
+import { UpgradeView } from './views/upgrade/UpgradeView';
 import { SettingsView } from './views/settings/SettingsView';
 import { ProfileView } from './views/profile/ProfileView';
 
@@ -110,6 +111,7 @@ export const App: React.FC = () => {
         <Route path="notifications" element={<NotificationsView />} />
         <Route path="reports" element={<ReportsView />} />
         <Route path="ai" element={<AIAssistantView />} />
+        <Route path="upgrade" element={<UpgradeView />} />
         <Route path="settings" element={<SettingsView />} />
         <Route path="profile" element={<ProfileView />} />
       </Route>

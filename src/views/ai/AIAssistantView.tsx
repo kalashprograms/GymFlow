@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
-import { Sparkles, Send, Bot, User, RefreshCw, MessageSquare, Flame, CheckCircle2 } from 'lucide-react';
+import { Sparkles, Send, Bot, User, RefreshCw, Copy, Check, AlertCircle, ArrowUpRight } from 'lucide-react';
 import Markdown from 'react-markdown';
 
 interface ChatMessage {
@@ -9,6 +9,7 @@ interface ChatMessage {
   sender: 'user' | 'assistant';
   text: string;
   timestamp: string;
+  source?: string;
 }
 
 export const AIAssistantView: React.FC = () => {
@@ -17,12 +18,14 @@ export const AIAssistantView: React.FC = () => {
     {
       id: '1',
       sender: 'assistant',
-      text: `Hello ${gym?.ownerName || 'Marcus'}! I am **GymFlow AI Copilot** 🤖. \n\nI have full real-time awareness of your gym's members, expiry schedules, monthly revenue, attendance records, and retention metrics.\n\nHow can I help you optimize ${gym?.name || 'IronPulse Fitness'} today?`,
+      text: `Hello **${gym?.ownerName || 'Marcus'}**! I am your **GymFlow AI Business & Retention Copilot** 🤖.\n\nI have real-time access to your gym's member database, upcoming expiry schedules, monthly revenue numbers, attendance patterns, and membership plans.\n\nHow can I help you optimize **${gym?.name || 'IronPulse Fitness Club'}** today?`,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      source: 'GymFlow Copilot',
     },
   ]);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -31,14 +34,21 @@ export const AIAssistantView: React.FC = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, isLoading]);
 
   const quickPrompts = [
     'Who is expiring this week and needs a reminder?',
     'Draft a 10% discount WhatsApp renewal message for expired members',
-    'Summarize our revenue and pending balances this month',
+    'Summarize our revenue, collections and pending balances',
     'What are our peak attendance hours and daily attendance rate?',
+    'Give me a 4-day workout & nutrition split for members',
   ];
+
+  const copyToClipboard = (text: string, id: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
 
   const handleSend = async (queryToSend?: string) => {
     const text = queryToSend || inputText;
@@ -62,16 +72,19 @@ export const AIAssistantView: React.FC = () => {
         sender: 'assistant',
         text: res.reply || "I've analyzed your gym records and here are the insights.",
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        source: (res as any).source || 'GymFlow AI',
       };
       setMessages((prev) => [...prev, botMsg]);
     } catch (e: any) {
-      const errorMsg: ChatMessage = {
+      console.error('AI assistant request failed:', e);
+      const botMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
         sender: 'assistant',
-        text: "I encountered a minor network error connecting to the intelligence engine. Please try again.",
+        text: `### ⚠️ Connection Notice\n\nI was unable to connect to the cloud engine, but here is a quick summary for **${gym?.name || 'your gym'}**:\n\n- You can manage expiring memberships directly in the **Members** or **Expiry Calendar** tabs.\n- Review unpaid balances under **Payments**.\n- Check today's check-ins in the **Attendance** section.`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        source: 'GymFlow Local',
       };
-      setMessages((prev) => [...prev, errorMsg]);
+      setMessages((prev) => [...prev, botMsg]);
     } finally {
       setIsLoading(false);
     }
@@ -88,14 +101,14 @@ export const AIAssistantView: React.FC = () => {
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-base font-semibold text-white font-sans">
-                GymFlow AI Business Copilot
+                GymFlow AI Business & Retention Copilot
               </h2>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-mono">
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
                 Live Data Connected
               </span>
             </div>
-            <p className="text-xs text-gray-500 font-sans">
-              Ask questions about membership expiries, financial analytics, or generate renewal copy
+            <p className="text-xs text-gray-400 font-sans mt-0.5">
+              Instant retention intelligence, revenue analysis, WhatsApp copy generation, & workout programming
             </p>
           </div>
         </div>
@@ -107,15 +120,17 @@ export const AIAssistantView: React.FC = () => {
               {
                 id: '1',
                 sender: 'assistant',
-                text: `Chat reset. What would you like to analyze or draft for ${gym?.name}?`,
+                text: `Chat reset. What would you like to analyze or draft for **${gym?.name || 'IronPulse Fitness'}**?`,
                 timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                source: 'GymFlow Copilot',
               },
             ])
           }
-          className="p-2 rounded-md border border-[#262626] bg-[#1a1a1a] text-gray-400 hover:text-white hover:bg-[#262626] transition-colors cursor-pointer"
+          className="p-2 rounded-md border border-[#262626] bg-[#1a1a1a] text-gray-400 hover:text-white hover:bg-[#262626] transition-colors cursor-pointer flex items-center gap-1.5 text-xs"
           title="Reset conversation"
         >
-          <RefreshCw className="w-4 h-4" />
+          <RefreshCw className="w-3.5 h-3.5" />
+          <span className="hidden sm:inline">New Chat</span>
         </button>
       </div>
 
@@ -139,26 +154,59 @@ export const AIAssistantView: React.FC = () => {
             </div>
 
             <div
-              className={`max-w-xl rounded-xl p-4 text-xs sm:text-sm leading-relaxed ${
+              className={`max-w-2xl rounded-xl p-4 text-xs sm:text-sm leading-relaxed relative group ${
                 m.sender === 'user'
                   ? 'bg-indigo-600 text-white'
                   : 'bg-[#141414] border border-[#262626] text-gray-200 shadow-sm'
               }`}
             >
               {m.sender === 'assistant' ? (
-                <div className="space-y-2 prose prose-invert max-w-none text-xs sm:text-sm">
+                <div className="space-y-2 prose prose-invert max-w-none text-xs sm:text-sm prose-p:my-1 prose-headings:text-white prose-code:text-indigo-300 prose-pre:bg-[#0a0a0a] prose-pre:border prose-pre:border-[#262626]">
                   <Markdown>{m.text}</Markdown>
                 </div>
               ) : (
                 <p className="whitespace-pre-wrap">{m.text}</p>
               )}
-              <span
-                className={`text-[10px] block mt-1 text-right font-mono ${
-                  m.sender === 'user' ? 'text-indigo-200' : 'text-gray-500'
-                }`}
-              >
-                {m.timestamp}
-              </span>
+
+              <div className="flex items-center justify-between mt-2 pt-1 border-t border-[#262626]/40 text-[10px] font-mono">
+                {m.source ? (
+                  <span className="text-indigo-400/80 bg-indigo-500/5 px-1.5 py-0.5 rounded border border-indigo-500/10">
+                    {m.source}
+                  </span>
+                ) : (
+                  <span />
+                )}
+
+                <div className="flex items-center gap-2">
+                  {m.sender === 'assistant' && (
+                    <button
+                      type="button"
+                      onClick={() => copyToClipboard(m.text, m.id)}
+                      className="text-gray-400 hover:text-white transition-colors flex items-center gap-1 cursor-pointer"
+                      title="Copy response"
+                    >
+                      {copiedId === m.id ? (
+                        <>
+                          <Check className="w-3 h-3 text-emerald-400" />
+                          <span className="text-emerald-400">Copied</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3 h-3" />
+                          <span>Copy</span>
+                        </>
+                      )}
+                    </button>
+                  )}
+                  <span
+                    className={
+                      m.sender === 'user' ? 'text-indigo-200' : 'text-gray-500'
+                    }
+                  >
+                    {m.timestamp}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         ))}
@@ -170,7 +218,7 @@ export const AIAssistantView: React.FC = () => {
             </div>
             <div className="p-3.5 bg-[#141414] border border-[#262626] rounded-xl text-xs text-gray-400 flex items-center gap-2 font-mono">
               <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
-              <span>Analyzing gym metrics & generating response...</span>
+              <span>Analyzing real-time gym database metrics & formulating response...</span>
             </div>
           </div>
         )}
@@ -180,17 +228,18 @@ export const AIAssistantView: React.FC = () => {
 
       {/* Suggested Quick Prompt Chips */}
       <div className="px-4 py-2.5 bg-[#0d0d0d] border-t border-[#262626] flex items-center gap-2 overflow-x-auto text-xs no-scrollbar">
-        <span className="text-[10px] font-mono text-gray-500 uppercase tracking-wider shrink-0">
-          Try Asking:
+        <span className="text-[10px] font-mono text-gray-400 uppercase tracking-wider shrink-0 font-medium">
+          Suggested Prompts:
         </span>
         {quickPrompts.map((prompt, i) => (
           <button
             key={i}
             type="button"
             onClick={() => handleSend(prompt)}
-            className="px-3 py-1 rounded-md bg-[#141414] border border-[#262626] hover:border-indigo-500 hover:text-white text-gray-400 text-xs shrink-0 transition-colors cursor-pointer font-sans"
+            className="px-3 py-1 rounded-md bg-[#141414] border border-[#262626] hover:border-indigo-500 hover:text-white text-gray-300 text-xs shrink-0 transition-colors cursor-pointer font-sans whitespace-nowrap flex items-center gap-1"
           >
-            {prompt}
+            <span>{prompt}</span>
+            <ArrowUpRight className="w-3 h-3 text-gray-500" />
           </button>
         ))}
       </div>
@@ -208,13 +257,14 @@ export const AIAssistantView: React.FC = () => {
             type="text"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
-            placeholder="Ask anything about gym revenue, renewals, expiring members, retention strategies..."
+            placeholder="Ask about expiring members, draft WhatsApp scripts, analyze revenue, or ask fitness advice..."
             className="flex-1 px-4 py-2.5 rounded-md border border-[#262626] bg-[#1a1a1a] text-white text-xs sm:text-sm focus:outline-none focus:border-indigo-500 font-sans"
           />
           <button
             type="submit"
             disabled={!inputText.trim() || isLoading}
             className="p-2.5 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs transition-colors cursor-pointer disabled:opacity-50"
+            title="Send prompt"
           >
             <Send className="w-4 h-4" />
           </button>

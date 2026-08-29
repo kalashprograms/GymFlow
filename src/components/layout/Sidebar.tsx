@@ -31,6 +31,7 @@ export type NavView =
   | 'notifications'
   | 'calendar'
   | 'ai'
+  | 'upgrade'
   | 'settings'
   | 'profile';
 
@@ -58,6 +59,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'attendance' as NavView, label: 'Attendance', icon: UserCheck },
     { id: 'payments' as NavView, label: 'Payments & Billing', icon: Flame },
     { id: 'reports' as NavView, label: 'Reports & Export', icon: FileSpreadsheet },
+    { id: 'upgrade' as NavView, label: 'Upgrade to PRO', icon: Zap, highlight: true },
     {
       id: 'notifications' as NavView,
       label: 'Notifications',
@@ -164,8 +166,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       {item.badge}
                     </span>
                   ) : item.highlight ? (
-                    <span className="text-[10px] font-semibold text-indigo-300 bg-indigo-950/80 border border-indigo-800/40 px-1.5 py-0.2 rounded">
-                      AI
+                    <span className="text-[10px] font-semibold text-indigo-300 bg-indigo-950/80 border border-indigo-800/40 px-1.5 py-0.2 rounded uppercase">
+                      {item.id === 'upgrade' ? 'PRO' : 'AI'}
                     </span>
                   ) : null}
                 </button>
