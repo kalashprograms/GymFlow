@@ -61,10 +61,10 @@ export const NewMemberModal: React.FC<NewMemberModalProps> = ({
   // Initialize or reset form
   useEffect(() => {
     if (memberToEdit) {
-      setFullName(memberToEdit.fullName);
+      setFullName(memberToEdit.fullName || '');
       setPhoto(memberToEdit.photo || '');
-      setPhoneNumber(memberToEdit.phoneNumber);
-      setWhatsAppNumber(memberToEdit.whatsAppNumber || memberToEdit.phoneNumber);
+      setPhoneNumber(memberToEdit.phoneNumber || '');
+      setWhatsAppNumber(memberToEdit.whatsAppNumber || memberToEdit.phoneNumber || '');
       setEmail(memberToEdit.email || '');
       setGender(memberToEdit.gender || 'male');
       setAge(memberToEdit.age?.toString() || '26');
@@ -74,11 +74,11 @@ export const NewMemberModal: React.FC<NewMemberModalProps> = ({
       setEmergencyContactName(memberToEdit.emergencyContactName || '');
       setEmergencyContactPhone(memberToEdit.emergencyContactPhone || '');
       setJoiningDate(memberToEdit.joiningDate || '2026-08-27');
-      setPlanId(memberToEdit.planId);
-      setStartDate(memberToEdit.membershipStartDate);
-      setExpiryDate(memberToEdit.membershipExpiryDate);
+      setPlanId(memberToEdit.planId || '');
+      setStartDate(memberToEdit.membershipStartDate || '');
+      setExpiryDate(memberToEdit.membershipExpiryDate || '');
       setTrainerAssigned(memberToEdit.trainerAssigned || 'None');
-      setPaymentStatus(memberToEdit.paymentStatus);
+      setPaymentStatus(memberToEdit.paymentStatus || 'paid');
       setNotes(memberToEdit.notes || '');
     } else {
       setFullName('');

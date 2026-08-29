@@ -36,13 +36,13 @@ export const PlanModal: React.FC<PlanModalProps> = ({
 
   useEffect(() => {
     if (planToEdit) {
-      setName(planToEdit.name);
-      setDurationMonths(planToEdit.durationMonths.toString());
+      setName(planToEdit.name || '');
+      setDurationMonths(planToEdit.durationMonths?.toString() || '1');
       setDurationDays((planToEdit.durationDays || 0).toString());
-      setPrice(planToEdit.price.toString());
+      setPrice(planToEdit.price?.toString() || '0');
       setDescription(planToEdit.description || '');
       setFeatures(planToEdit.features || []);
-      setIsActive(planToEdit.isActive);
+      setIsActive(planToEdit.isActive ?? true);
     } else {
       setName('');
       setDurationMonths('1');

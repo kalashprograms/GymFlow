@@ -40,7 +40,7 @@ export const NewPaymentModal: React.FC<NewPaymentModalProps> = ({
       const data = await api.getMembers();
       setMembers(data);
       if (data.length > 0) {
-        setSelectedMemberId(data[0].id);
+        setSelectedMemberId(data[0].id || '');
       }
     } catch (e) {
       console.error(e);
