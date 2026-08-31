@@ -1,0 +1,16 @@
+[build]
+command = "bun run build"
+publish = "dist"
+
+[dev]
+command = "bun run dev"
+targetPort = 3000
+port = 8889
+framework = "#custom"
+autoLaunch = false
+
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200
+force = false
